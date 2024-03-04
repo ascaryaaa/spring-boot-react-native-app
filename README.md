@@ -1,6 +1,6 @@
 # Learning react antive with spring boot
 This project is for my personal learning purposes.
-Learning sourse and reference:
+Learning sources and references:
 - https://www.youtube.com/watch?v=h7QcSe-LYZg
 - https://github.com/oktadev/okta-react-native-spring-boot-example
 
