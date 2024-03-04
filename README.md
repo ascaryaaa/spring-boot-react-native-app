@@ -1,3 +1,9 @@
+# Learning react antive with spring boot
+This project is for my personal learning purposes.
+Learning sourse and reference:
+- https://www.youtube.com/watch?v=h7QcSe-LYZg
+- https://github.com/oktadev/okta-react-native-spring-boot-example
+
 # React Native mobile app, Spring Boot API, and OIDC Authentication
  
 A React Native and Spring Boot app with the following features:
