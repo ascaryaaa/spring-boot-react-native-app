@@ -1,0 +1,17 @@
+{
+  "generator-jhipster": {
+    "appsFolders": [
+      "jhipster-api"
+    ],
+    "directoryPath": "../",
+    "serviceDiscoveryType": false,
+    "jwtSecretKey": "NWIzYTlhOWNiMmI2Njc0MTExZTNjZWI3YzU5ZTczYWNlZWY5ODc0ZWFlMGFmMmIwZGU4NmIyNjE1ZDAzZDg3OTJlY2JjMzFkNDFjNmI4Y2U3OGU4YzcwZjFkMTVkNTc4YmJlZA==",
+    "dockerRepositoryName": "mraible",
+    "dockerPushCommand": "docker push",
+    "kubernetesNamespace": "default",
+    "kubernetesServiceType": "LoadBalancer",
+    "monitoring": "no",
+    "istio": "no",
+    "istioRoute": false
+  }
+}

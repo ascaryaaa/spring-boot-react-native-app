@@ -1,0 +1,150 @@
+:experimental:
+// Define unicode for Apple Command key.
+:commandkey: &#8984;
+
+== Build a Mobile App with React Native and Spring Boot
+
+The brackets at the end of each step indicate the alias's or IntelliJ Live Templates to use. You can find the template definitions at https://github.com/mraible/idea-live-templates[mraible/idea-live-templates].
+
+=== Spring Boot API
+
+. Install JHipster: `npm install -g generator-jhipster`
+. Create a new directory for API: `mkdir -p react-native-spring-boot/jhipster-api`
+. Download https://github.com/jhipster/jdl-samples/blob/master/21-points.jh[21-Points Health JDL] into the root directory.
+. Create app with import-jdl:
+
+  jhipster import-jdl ../app.jh
+
+. Start Docker containers:
+
+  docker-compose -f src/main/docker/elasticsearch.yml up -d
+  docker-compose -f src/main/docker/keycloak.yml up -d
+  docker-compose -f src/main/docker/postgresql.yml up -d
+  docker-compose -f src/main/docker/sonar.yml up -d
+
+. Ensure coverage with Sonar (results at http://localhost:9001):
+
+  ./gradlew -Pprod clean test sonarqube
+
+=== React Native App
+
+. Install Ignite CLI and Ignite JHipster
+
+  npm i -g ignite-cli@2.2.2 ignite-jhipster@2.0.3
+
+. Create app:
+
+  ignite new HealthPoints -b ignite-jhipster
+
+. Rename `HealthPoints` to `react-native-app`.
+
+. Restart Spring Boot app and Keycloak:
+
+  docker-compose -f jhipster-api/src/main/docker/keycloak.yml restart
+
+. To run on iOS, cd into `react-native-app/ios` and run `pod install`
+
+. In the `reactive-native-app` directory, run `react-native run-ios`
+
+. To run on Android, use `react-native run-android`
+
+. For AVD to communicate with your API and Keycloak, you need to add some port mappings
+
+  adb reverse tcp:8080 tcp:8080
+  adb reverse tcp:9080 tcp:9080
+
+. Generate UI screens in React Native app
+
+  ignite generate import-jdl ../app.jh
+
+. Open `points-entity-edit-screen.js` and change the `formModel` to use `t.Boolean` for exercise, meals, and alcohol
+
+  formModel: t.struct({
+    id: t.maybe(t.Number),
+    date: t.Date,
+    exercise: t.maybe(t.Boolean),
+    meals: t.maybe(t.Boolean),
+    alcohol: t.maybe(t.Boolean),
+    notes: t.maybe(t.String),
+    userId: this.getUsers()
+  }),
+
+. Change `entityToFormValue()` to set the toggle to on if the value is 1 [`rn-entityToForm`]
+
+  entityToFormValue = (value) => {
+    if (!value) {
+      return {}
+    }
+    return {
+      id: value.id || null,
+      date: value.date || null,
+      exercise: (value.exercise === 1),
+      meals: (value.meals === 1),
+      alcohol: (value.alcohol === 1),
+      notes: value.notes || null,
+      userId: (value.user && value.user.id) ? value.user.id : null
+    }
+  }
+  
+. Change `formValueToEntity()` to save 1 or 0, depending on the user's selection [`rn-formToEntity`]
+
+  formValueToEntity = (value) => {
+    const entity = {
+      id: value.id || null,
+      date: value.date || null,
+      exercise: (value.exercise) ? 1 : 0,
+      meals: (value.meals) ? 1 : 0,
+      alcohol: (value.alcohol) ? 1 : 0,
+      notes: value.notes || null
+    }
+    if (value.userId) {
+      entity.user = { id: value.userId }
+    }
+    return entity
+  }
+
+. Add default form values in `componentWillMount()` [`rn-defaultValues`]
+
+  componentWillMount () {
+    if (this.props.data.entityId) {
+      this.props.getPoint(this.props.data.entityId)
+    } else {
+      this.setState({
+        formValue: {
+          id: null,
+          date: new Date(),
+          exercise: true,
+          meals: true,
+          alcohol: true
+        }
+      })
+    }
+    this.props.getAllUsers()
+  }
+
+. Refresh your app in Simulator using kbd:[{commandkey} + R]
+
+. Tweak React App in JHipster (`points-update.tsx`) to use checkboxes [`react-checkboxes`]
+
+=== Use Okta for Identity
+
+. Create **Web** application on Okta and set `http://localhost:8080/login` as login redirect URI and `http://localhost:8080` as a logout redirect URI
+
+. Create `~/.okta.env` and specify the settings for your app; show Okta login on API
+
+. Create a **Native** app with PKCE, use `healthpoints://authorize` for the login redirect URI
+
+. Modify `react-native-app/app/modules/login/login.sagas.js` to use the generated clientId
+
+. Logout of React Native app, refresh, and login with Okta
+
+=== Debugging
+
+. Use https://github.com/infinitered/reactotron and `console.tron.log()` instead of `console.log()`
+
+=== Packaging for Production
+
+. See this demo's  https://developer.okta.com/blog/2018/10/10/react-native-spring-boot-mobile-app#packaging-your-react-native-app-for-production[companion blog post] to see how to deploy it to Cloud Foundry and Google Cloud. 
+. Fini!
+
+Source: https://developer.okta.com/blog/2018/10/10/react-native-spring-boot-mobile-app[Build a Mobile App with React Native and Spring Boot]
